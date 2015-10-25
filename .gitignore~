@@ -1,0 +1,18 @@
+#new input and output folder
+bucket
+
+*.class
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+# data files #
+*.csv
+
+# output dir, if present #
+output
+
+# OSX files #
+.DS_Store
