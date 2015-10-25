@@ -3,8 +3,10 @@ package nist.cleaning.jobs;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.SortedMap;
@@ -31,10 +33,15 @@ public class Job2Reducer extends Reducer<Text, Text, Text, Text> {
 			throws IOException, InterruptedException {
 		
 		SortedMap<Date, StringBuilder> dataMap = new TreeMap<Date, StringBuilder>();
+		HashSet<String> keys = new HashSet<String>();
 		for (Text v : values) {
 			StringBuilder str = new StringBuilder(v.toString());
 			String[] valueString = v.toString().split("\\|");
+			//----------------
+//			String lane_id = valueString[0];
 			String datetime = valueString[1];
+			String lineNumber = valueString[7];
+			keys.add(lineNumber);
 			Date date = null;
 			try {
 				date = format1.parse(datetime);
@@ -54,7 +61,6 @@ public class Job2Reducer extends Reducer<Text, Text, Text, Text> {
 		while (keyIter.hasNext()) {
 			Date keyDate = keyIter.next();
 			StringBuilder valueText = dataMap.get(keyDate);
-
 			cal.setTime(keyDate); // sets calendar time/date
 			cal.add(Calendar.MINUTE, -1 * Utils.LOOKBACK_MINUTES); // subtract
 																	// LOOKBACK_MINS
@@ -64,7 +70,6 @@ public class Job2Reducer extends Reducer<Text, Text, Text, Text> {
 			cal.add(Calendar.MINUTE, Utils.LOOKBACK_MINUTES); // adds
 																// LOOKBACK_MINS
 			Date endDate = cal.getTime();
-
 			Map<Date, StringBuilder> subMap = dataMap.subMap(startDate, endDate);
 			double avgFlow = 0.0;
 			if (subMap.size() > 0) {
@@ -74,23 +79,22 @@ public class Job2Reducer extends Reducer<Text, Text, Text, Text> {
 					String nextval = subMap.get(nextKey).toString();
 					String[] vals = nextval.split("\\|");
 					//check if flag is 1 then only consider this flow value
-//					int flag = Integer.valueOf(vals[5]);
-//					if(flag ==1){
-					try{
+					int flag = Integer.valueOf(vals[5]);
+					if(flag ==1){
 						avgFlow += Integer.parseInt(vals[3]);
-					//}
-					}catch(Exception e){
-						System.out.println();
 					}
 				}
 				avgFlow = avgFlow/subMap.size();
 			}
 			cal.setTime(keyDate);
-			String keyString = String.valueOf(cal.get(cal.YEAR)) + String.valueOf(cal.get(cal.MONTH));
-			valueText.append("|").append(avgFlow);
-			outKey.set(keyString);
+			//String keyString = String.valueOf(cal.get(cal.YEAR)) + String.valueOf(cal.get(cal.MONTH));
+			valueText.append("|").append(String.valueOf(avgFlow));
+			//outKey.set(keyString);
 			outValue.set(valueText.toString());
-			context.write(outKey, outValue);
+			for(String k : keys){
+				outKey.set(k);
+				context.write(outKey, outValue);
+			}
 			
 		}
 

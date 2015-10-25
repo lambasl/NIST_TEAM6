@@ -86,35 +86,6 @@ public class Job2Mapper extends Mapper<LongWritable, Text , Text, Text> {
 		} catch (Exception e) {
 			System.out.println(sb.toString());
 		}
-		
-		
-		
-//		String line = value.toString();
-//		String[] tokens = line.split("(?x),(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
-//		StringBuilder str = new StringBuilder();
-//		str.append(tokens[6] + "\t");
-//		str.append(tokens[7] + "\t");
-//		String lat = tokens[8];
-//		String lon = tokens[9];
-//		lat = lat.length() > 6 ? lat.substring(0,6) : lat;
-//		lon = lon.length() > 7 ? lon.substring(0,7) : lon;
-//		str.append(lat + "\t");
-//		str.append(lon + "\t");
-//		
-//		String timestamp = tokens[2];
-//		int lastIndex = timestamp.lastIndexOf('-');
-//		if(lastIndex != -1){
-//			timestamp = timestamp.substring(0, lastIndex);
-//		}
-//		String[] dateAndTime = timestamp.split("\\s+");
-//		String date = dateAndTime[0];
-//		//String time = dateAndTime[dateAndTime.length - 1];
-//		str.append(date);
-//		outKey.set(str.toString());
-//		//String zone_id = tokens[5];
-//		String flow = tokens[4];
-//		outValue.set(timestamp + "\t" + flow);
-//		context.write(outKey, outValue);
 	}
 
 }
